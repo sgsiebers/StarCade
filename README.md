@@ -4,4 +4,6 @@ I was looking for a fun father/son project that I could work with my bright, tec
 
 StarCade is powered by a Raspberry Pi to run the core gaming functions, and an Arduino Uno to run all the special effects.  Eventually I may get around to posting our basic plans for this build, but for now I'm at least sharing the source code for anyone who may want learn from our work.
 
-This is still very much a work in progress.  Hopefully you won't have to wait years to see the final result!
+This is still very much a work in progress.  Hopefully you won't have to wait years to see the final result!  For now,  the 3D model we built will have to serve as a placeholder for the real thing.
+
+![StarCade 3D Model](StarcadeModel.png)
