@@ -6,4 +6,4 @@ StarCade is powered by a Raspberry Pi to run the core gaming functions, and an A
 
 This is still very much a work in progress.  Hopefully you won't have to wait years to see the final result!  For now,  the 3D model we built will have to serve as a placeholder for the real thing.
 
-![StarCade 3D Model](StarcadeModel.png)
+<img src="StarcadeModel.png" width=50% height=50% align="middle">
