@@ -111,9 +111,9 @@ void setup() {
   pinMode(MAIN_POWER_RELAY,OUTPUT);
   pinMode(MARQUEE_RELAY,OUTPUT);
   pinMode(BUTTON_LED_RELAY,OUTPUT);
-  digitalWrite(MAIN_POWER_RELAY,LOW);
-  digitalWrite(MARQUEE_RELAY,LOW);
-  digitalWrite(BUTTON_LED_RELAY,LOW);
+  digitalWrite(MAIN_POWER_RELAY,HIGH);
+  digitalWrite(MARQUEE_RELAY,HIGH);
+  digitalWrite(BUTTON_LED_RELAY,HIGH);
 
 }
 
@@ -135,9 +135,9 @@ void processPowerButton(){
     case OFF:
       if(powerDebounce.fell()){
         DEBUG_PRINT("Powering on...");
-        digitalWrite(MAIN_POWER_RELAY,HIGH);
-        digitalWrite(MARQUEE_RELAY,HIGH);
-        digitalWrite(BUTTON_LED_RELAY,HIGH);
+        digitalWrite(MAIN_POWER_RELAY,LOW);
+        digitalWrite(MARQUEE_RELAY,LOW);
+        digitalWrite(BUTTON_LED_RELAY,LOW);
         soundPlayer.playSound(SoundFx::SABER_ON);
         saberIndex = 0;
         powerState = POWERING_ON;
@@ -154,9 +154,9 @@ void processPowerButton(){
     case ON:
       if(powerDebounce.fell()){
         DEBUG_PRINT("Powering off...");
-        digitalWrite(MAIN_POWER_RELAY,LOW);
-        digitalWrite(MARQUEE_RELAY,LOW);
-        digitalWrite(BUTTON_LED_RELAY,LOW);
+        digitalWrite(MAIN_POWER_RELAY,HIGH);
+        digitalWrite(MARQUEE_RELAY,HIGH);
+        digitalWrite(BUTTON_LED_RELAY,HIGH);
         soundPlayer.playSound(SoundFx::SABER_OFF);
         saberIndex = SABER_LENGTH-1;
         powerState = POWERING_OFF;
