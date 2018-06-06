@@ -14,15 +14,24 @@
 #endif
 
 
-//Pins
+
+////////////////////////////
+//  PIN Definitions 
+////////////////////////////
+
 //Reserve pins 0 & 1 for serial debug
 #define POWER_BUTTON 2
 #define FIRE_DS_BUTTON 3
 #define LEFT_LIGHTSABER_PIN 4
 #define RIGHT_LIGHTSABER_PIN 5
-#define BACKLIGHT_PIN 6
-#define DEATHSTAR_BEAM_PIN 7
+#define LEFT_BACKLIGHT_PIN 6
+#define RIGHT_BACKLIGHT_PIN 7
 // Sound Pins 8-10
+#define DEATHSTAR_BEAM_PIN 11
+#define DEATHSTAR_RING_PIN 12
+
+
+//TODO: Move these to Analog pins
 #define MAIN_POWER_RELAY_PIN 11
 #define MARQUEE_RELAY_PIN 12
 #define BUTTON_LED_RELAY_PIN 13
@@ -35,18 +44,57 @@ Bounce powerDebounce = Bounce();
 SYSTEM_STATE systemState = OFF;
 
 
-//LightSaber LEDs
-#define SABER_LENGTH 50
+
+////////////////////////////
+//  LED Definitions 
+////////////////////////////
+
+// LightSaber LEDs
+#define SABER_LENGTH 60
 CRGB leftSaberLEDs[SABER_LENGTH];
 CRGB rightSaberLEDs[SABER_LENGTH];
 LedStrip leftLightSaber = {leftSaberLEDs,SABER_LENGTH};
 LedStrip rightLightSaber = {rightSaberLEDs,SABER_LENGTH};
+
+// Ambient Backlight LEDs
+#define BACKLIGHT_LENGTH 90
+CRGB leftBacklightLEDs[BACKLIGHT_LENGTH];
+CRGB rightBacklightLEDs[BACKLIGHT_LENGTH];
+LedStrip leftBacklight = {leftBacklightLEDs,BACKLIGHT_LENGTH};
+LedStrip rightBacklight = {rightBacklightLEDs,BACKLIGHT_LENGTH};
+
+// Death Star LEDs
+#define DS_BEAM_LENGTH 60
+#define DS_RING_LENGTH 12
+CRGB deathStarLEDs[DS_BEAM_LENGTH];
+CRGB deathStarRingLEDs[DS_RING_LENGTH];
+LedStrip deathStarBeam = {deathStarLEDs,DS_BEAM_LENGTH};
+LedStrip deathStarRing = {deathStarRingLEDs,DS_RING_LENGTH};
+
+////////////////////////////
+//  Command Definitions 
+////////////////////////////
+
+// Power Commands
 FillCommand fillLeftSaberRed = FillCommand();
 FillCommand fillRightSaberBlue = FillCommand();
 FillCommand fillLeftSaberBlack = FillCommand();
 FillCommand fillRightSaberBlack = FillCommand();
 ParallelCommand<3> powerOnCommand = ParallelCommand<3>();
 ParallelCommand<3> powerOffCommand = ParallelCommand<3>();
+
+// Fire DS Commands
+FadeCommand fadeLeftSaberOut = FadeCommand();
+FadeCommand fadeRightSaberOut = FadeCommand();
+FadeCommand fadeLeftSaberIn = FadeCommand();
+FadeCommand fadeRightSaberIn = FadeCommand();
+DelayCommand delay4seconds = DelayCommand();
+DelayCommand delay10seconds = DelayCommand();
+ParallelCommand<2> fireDSCommand = ParallelCommand<2>();
+ParallelCommand<2> fadeSabersOut = ParallelCommand<2>();
+ParallelCommand<2> fadeSabersIn = ParallelCommand<2>();
+CommandSequence<4> fadeInOut = CommandSequence<4>();
+
 
 
 //Sounds
@@ -124,6 +172,18 @@ void setupAnimations(){
   fillLeftSaberBlack.init(leftLightSaber,CRGB::Black,SABER_FILL_RATE,FillCommand::Direction::REVERSE);
   fillRightSaberBlack.init(rightLightSaber,CRGB::Black,SABER_FILL_RATE,FillCommand::Direction::REVERSE);
   powerOffCommand.add(&fillLeftSaberBlack).add(&fillRightSaberBlack).add(&lightSaberOffSound);
+
+  //Death Star Animation
+  delay4seconds.init(4000);
+  fadeLeftSaberOut.init(leftLightSaber, CRGB::Red, 5000, FadeCommand::Direction::OUT);
+  fadeRightSaberOut.init(rightLightSaber, CRGB::Blue, 5000, FadeCommand::Direction::OUT);
+  fadeSabersOut.add(&fadeLeftSaberOut).add(&fadeRightSaberOut);
+  delay10seconds.init(10000);
+  fadeLeftSaberIn.init(leftLightSaber, CRGB::Red, 3000, FadeCommand::Direction::IN);
+  fadeRightSaberIn.init(rightLightSaber, CRGB::Blue, 3000, FadeCommand::Direction::IN);
+  fadeSabersIn.add(&fadeLeftSaberIn).add(&fadeRightSaberIn);
+  fadeInOut.add(&delay4seconds).add(&fadeSabersOut).add(&delay10seconds).add(&fadeSabersIn);
+  fireDSCommand.add(&fireDeathStarSound).add(&fadeInOut);  
 }
 
 
@@ -175,11 +235,12 @@ void processFireDS(){
   fireDSDebounce.update();
   if(systemState == ON && fireDSDebounce.fell()){
     DEBUG_PRINT("Fire Death Star!!!!"); 
-    fireDeathStarSound.begin();
+    fireDSCommand.begin();
     systemState = FIRING_DS;
   }else if(systemState == FIRING_DS){
-    fireDeathStarSound.update();
-    if(fireDeathStarSound.isDone()){
+    fireDSCommand.update();
+    FastLED.show();
+    if(fireDSCommand.isDone()){
       DEBUG_PRINT("Alderaan has been destroyed!"); 
       systemState = ON;
     }
