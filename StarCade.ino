@@ -8,7 +8,7 @@
 //Debug mode
 #define DEBUG
 #ifdef DEBUG
- #define DEBUG_PRINT(x)  Serial.println (x)
+ #define DEBUG_PRINT(x)  Serial.println (F(x))
 #else
  #define DEBUG_PRINT(x)
 #endif
@@ -19,29 +19,35 @@
 //  PIN Definitions 
 ////////////////////////////
 
-//Reserve pins 0 & 1 for serial debug
-#define POWER_BUTTON 2
-#define FIRE_DS_BUTTON 3
-#define LEFT_LIGHTSABER_PIN 4
-#define RIGHT_LIGHTSABER_PIN 5
-#define LEFT_BACKLIGHT_PIN 6
-#define RIGHT_BACKLIGHT_PIN 7
-// Sound Pins 8-10
-#define DEATHSTAR_BEAM_PIN 11
-#define DEATHSTAR_RING_PIN 12
+// NOTE: Pins 0 & 1 inactive in DEBUG mode for serial diagnostics
+#define MARQUEE_RELAY_PIN 0
+#define BUTTON_LED_RELAY_PIN 1
+#define MAIN_POWER_RELAY_PIN 2
+#define POWER_BUTTON 3
+#define FIRE_DS_BUTTON 4
+#define LEFT_LIGHTSABER_PIN 5
+#define RIGHT_LIGHTSABER_PIN 6
+#define LEFT_BACKLIGHT_PIN 7
+#define RIGHT_BACKLIGHT_PIN 8
+#define POWER_ON_SOUND_PIN 9
+#define POWER_OFF_SOUND_PIN 10
+#define FIRE_DS_SOUND_PIN 11
+#define DEATHSTAR_BEAM_PIN 12
+#define DEATHSTAR_RING_PIN 13
 
 
-//TODO: Move these to Analog pins
-#define MAIN_POWER_RELAY_PIN 11
-#define MARQUEE_RELAY_PIN 12
-#define BUTTON_LED_RELAY_PIN 13
 
 
-//Power On/Off
+////////////////////////////
+//  Misc. State and Input
+////////////////////////////
+
+
 enum SYSTEM_STATE {OFF=0, POWERING_ON=1, ON=2, POWERING_OFF=3, FIRING_DS = 4};
-#define POWER_HOLD_MS 50
-Bounce powerDebounce = Bounce();
 SYSTEM_STATE systemState = OFF;
+
+Bounce powerDebounce = Bounce();
+Bounce fireDSDebounce = Bounce();
 
 
 
@@ -50,10 +56,10 @@ SYSTEM_STATE systemState = OFF;
 ////////////////////////////
 
 // LightSaber LEDs
-#define SABER_LENGTH 60
-CRGB leftSaberLEDs[SABER_LENGTH];
-CRGB rightSaberLEDs[SABER_LENGTH];
-LedStrip leftLightSaber = {leftSaberLEDs,SABER_LENGTH};
+#define SABER_LENGTH 55
+//CRGB leftSaberLEDs[SABER_LENGTH];
+//CRGB rightSaberLEDs[SABER_LENGTH];
+LedStrip leftLightSaber = {CRGB[SABER_LENGTH],SABER_LENGTH};//{leftSaberLEDs,SABER_LENGTH};
 LedStrip rightLightSaber = {rightSaberLEDs,SABER_LENGTH};
 
 // Ambient Backlight LEDs
@@ -64,12 +70,14 @@ LedStrip leftBacklight = {leftBacklightLEDs,BACKLIGHT_LENGTH};
 LedStrip rightBacklight = {rightBacklightLEDs,BACKLIGHT_LENGTH};
 
 // Death Star LEDs
-#define DS_BEAM_LENGTH 60
-#define DS_RING_LENGTH 12
+#define DS_BEAM_LENGTH 1
+#define DS_RING_LENGTH 1
 CRGB deathStarLEDs[DS_BEAM_LENGTH];
 CRGB deathStarRingLEDs[DS_RING_LENGTH];
 LedStrip deathStarBeam = {deathStarLEDs,DS_BEAM_LENGTH};
 LedStrip deathStarRing = {deathStarRingLEDs,DS_RING_LENGTH};
+
+
 
 ////////////////////////////
 //  Command Definitions 
@@ -80,8 +88,8 @@ FillCommand fillLeftSaberRed = FillCommand();
 FillCommand fillRightSaberBlue = FillCommand();
 FillCommand fillLeftSaberBlack = FillCommand();
 FillCommand fillRightSaberBlack = FillCommand();
-ParallelCommand<3> powerOnCommand = ParallelCommand<3>();
-ParallelCommand<3> powerOffCommand = ParallelCommand<3>();
+ParallelCommand<5> powerOnCommand = ParallelCommand<5>();
+ParallelCommand<5> powerOffCommand = ParallelCommand<5>();
 
 // Fire DS Commands
 FadeCommand fadeLeftSaberOut = FadeCommand();
@@ -98,19 +106,19 @@ CommandSequence<4> fadeInOut = CommandSequence<4>();
 
 
 //Sounds
-SoundCommand lightSaberOnSound = SoundCommand(8,2500);
-SoundCommand lightSaberOffSound = SoundCommand(9,1500);
-SoundCommand fireDeathStarSound = SoundCommand(10,22000);
+SoundCommand lightSaberOnSound = SoundCommand(POWER_ON_SOUND_PIN,2500);
+SoundCommand lightSaberOffSound = SoundCommand(POWER_OFF_SOUND_PIN,1500);
+SoundCommand fireDeathStarSound = SoundCommand(FIRE_DS_SOUND_PIN,22000);
 
 
 //Timing Definitions
 #define LOOP_WAIT_MS 1
 #define FIRE_DS_HOLD_MS 50
+#define POWER_HOLD_MS 50
 #define SABER_FILL_RATE 20
 
 
 
-Bounce fireDSDebounce = Bounce();
 
 
 
@@ -138,15 +146,21 @@ void setup() {
   //Setup LEDs
   FastLED.addLeds<NEOPIXEL, LEFT_LIGHTSABER_PIN>(leftLightSaber.leds, SABER_LENGTH);
   FastLED.addLeds<NEOPIXEL, RIGHT_LIGHTSABER_PIN>(rightLightSaber.leds, SABER_LENGTH);
+  FastLED.addLeds<NEOPIXEL, LEFT_BACKLIGHT_PIN>(leftBacklight.leds, BACKLIGHT_LENGTH);
+  FastLED.addLeds<NEOPIXEL, RIGHT_BACKLIGHT_PIN>(rightBacklight.leds, BACKLIGHT_LENGTH);
+  FastLED.addLeds<NEOPIXEL, DEATHSTAR_BEAM_PIN>(deathStarBeam.leds, DS_BEAM_LENGTH);
+  FastLED.addLeds<NEOPIXEL, DEATHSTAR_RING_PIN>(deathStarRing.leds, DS_RING_LENGTH);
 
 
   //Relays
   pinMode(MAIN_POWER_RELAY_PIN,OUTPUT);
+  digitalWrite(MAIN_POWER_RELAY_PIN,HIGH);
+#ifndef DEBUG
   pinMode(MARQUEE_RELAY_PIN,OUTPUT);
   pinMode(BUTTON_LED_RELAY_PIN,OUTPUT);
-  digitalWrite(MAIN_POWER_RELAY_PIN,HIGH);
   digitalWrite(MARQUEE_RELAY_PIN,HIGH);
   digitalWrite(BUTTON_LED_RELAY_PIN,HIGH);
+#endif
 
   setupAnimations();
 
@@ -194,8 +208,10 @@ void processPowerButton(){
       if(powerDebounce.fell()){
         DEBUG_PRINT("Powering on...");
         digitalWrite(MAIN_POWER_RELAY_PIN,LOW);
+#ifndef DEBUG        
         digitalWrite(MARQUEE_RELAY_PIN,LOW);
         digitalWrite(BUTTON_LED_RELAY_PIN,LOW);
+#endif        
         powerOnCommand.begin();
         systemState = POWERING_ON;
       }
@@ -212,8 +228,10 @@ void processPowerButton(){
       if(powerDebounce.fell()){
         DEBUG_PRINT("Powering off...");
         digitalWrite(MAIN_POWER_RELAY_PIN,HIGH);
+#ifndef DEBUG        
         digitalWrite(MARQUEE_RELAY_PIN,HIGH);
         digitalWrite(BUTTON_LED_RELAY_PIN,HIGH);
+#endif        
         powerOffCommand.begin();
         systemState = POWERING_OFF;
       }
