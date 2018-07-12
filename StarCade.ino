@@ -5,14 +5,6 @@
 
 
 
-//Debug mode
-#define DEBUG
-#ifdef DEBUG
- #define DEBUG_PRINT(x)  Serial.println (F(x))
-#else
- #define DEBUG_PRINT(x)
-#endif
-
 
 
 ////////////////////////////
@@ -37,6 +29,12 @@
 
 
 
+//Timing Definitions
+#define LOOP_WAIT_MS 1
+#define FIRE_DS_HOLD_MS 50
+#define POWER_HOLD_MS 50
+#define SABER_FILL_RATE 20
+
 
 ////////////////////////////
 //  Misc. State and Input
@@ -56,26 +54,20 @@ Bounce fireDSDebounce = Bounce();
 ////////////////////////////
 
 // LightSaber LEDs
-#define SABER_LENGTH 55
-//CRGB leftSaberLEDs[SABER_LENGTH];
-//CRGB rightSaberLEDs[SABER_LENGTH];
-LedStrip leftLightSaber = {CRGB[SABER_LENGTH],SABER_LENGTH};//{leftSaberLEDs,SABER_LENGTH};
-LedStrip rightLightSaber = {rightSaberLEDs,SABER_LENGTH};
+#define SABER_LENGTH 50
+CRGB leftSaberLEDs[SABER_LENGTH] = {CRGB::Black};
+CRGB rightSaberLEDs[SABER_LENGTH] = {CRGB::Black};
 
 // Ambient Backlight LEDs
-#define BACKLIGHT_LENGTH 90
-CRGB leftBacklightLEDs[BACKLIGHT_LENGTH];
-CRGB rightBacklightLEDs[BACKLIGHT_LENGTH];
-LedStrip leftBacklight = {leftBacklightLEDs,BACKLIGHT_LENGTH};
-LedStrip rightBacklight = {rightBacklightLEDs,BACKLIGHT_LENGTH};
+#define BACKLIGHT_LENGTH 20
+CRGB leftBacklightLEDs[BACKLIGHT_LENGTH] = {CRGB::Black};
+CRGB rightBacklightLEDs[BACKLIGHT_LENGTH] = {CRGB::Black};
 
 // Death Star LEDs
-#define DS_BEAM_LENGTH 1
-#define DS_RING_LENGTH 1
-CRGB deathStarLEDs[DS_BEAM_LENGTH];
-CRGB deathStarRingLEDs[DS_RING_LENGTH];
-LedStrip deathStarBeam = {deathStarLEDs,DS_BEAM_LENGTH};
-LedStrip deathStarRing = {deathStarRingLEDs,DS_RING_LENGTH};
+#define DS_BEAM_LENGTH 60
+#define DS_RING_LENGTH 12
+CRGB deathStarLEDs[DS_BEAM_LENGTH] = {CRGB::Black};
+CRGB deathStarRingLEDs[DS_RING_LENGTH] = {CRGB::Black};
 
 
 
@@ -83,39 +75,40 @@ LedStrip deathStarRing = {deathStarRingLEDs,DS_RING_LENGTH};
 //  Command Definitions 
 ////////////////////////////
 
-// Power Commands
-FillCommand fillLeftSaberRed = FillCommand();
-FillCommand fillRightSaberBlue = FillCommand();
-FillCommand fillLeftSaberBlack = FillCommand();
-FillCommand fillRightSaberBlack = FillCommand();
-ParallelCommand<5> powerOnCommand = ParallelCommand<5>();
-ParallelCommand<5> powerOffCommand = ParallelCommand<5>();
-
-// Fire DS Commands
-FadeCommand fadeLeftSaberOut = FadeCommand();
-FadeCommand fadeRightSaberOut = FadeCommand();
-FadeCommand fadeLeftSaberIn = FadeCommand();
-FadeCommand fadeRightSaberIn = FadeCommand();
-DelayCommand delay4seconds = DelayCommand();
-DelayCommand delay10seconds = DelayCommand();
-ParallelCommand<2> fireDSCommand = ParallelCommand<2>();
-ParallelCommand<2> fadeSabersOut = ParallelCommand<2>();
-ParallelCommand<2> fadeSabersIn = ParallelCommand<2>();
-CommandSequence<4> fadeInOut = CommandSequence<4>();
-
-
-
 //Sounds
 SoundCommand lightSaberOnSound = SoundCommand(POWER_ON_SOUND_PIN,2500);
 SoundCommand lightSaberOffSound = SoundCommand(POWER_OFF_SOUND_PIN,1500);
 SoundCommand fireDeathStarSound = SoundCommand(FIRE_DS_SOUND_PIN,22000);
 
 
-//Timing Definitions
-#define LOOP_WAIT_MS 1
-#define FIRE_DS_HOLD_MS 50
-#define POWER_HOLD_MS 50
-#define SABER_FILL_RATE 20
+// Power Commands
+FillCommand fillLeftSaberRed = FillCommand(leftSaberLEDs,SABER_LENGTH,CRGB::Red,SABER_FILL_RATE,FillCommand::Direction::FORWARD);
+FillCommand fillRightSaberBlue = FillCommand(rightSaberLEDs,SABER_LENGTH,CRGB::Blue,SABER_FILL_RATE,FillCommand::Direction::FORWARD);
+FillCommand fillLeftSaberBlack = FillCommand(leftSaberLEDs,SABER_LENGTH,CRGB::Black,SABER_FILL_RATE,FillCommand::Direction::REVERSE);
+FillCommand fillRightSaberBlack = FillCommand(rightSaberLEDs,SABER_LENGTH,CRGB::Black,SABER_FILL_RATE,FillCommand::Direction::REVERSE);
+Command* powerOnCommmands[3] = {&fillLeftSaberRed,&fillRightSaberBlue,&lightSaberOnSound};
+Command* powerOffCommands[3] = {&fillLeftSaberBlack,&fillRightSaberBlack,&lightSaberOffSound};
+ParallelCommand powerOnCommand = ParallelCommand(powerOnCommmands,3);
+ParallelCommand powerOffCommand = ParallelCommand(powerOffCommands,3);
+
+
+// Fire DS Commands
+FadeCommand fadeLeftSaberOut = FadeCommand(leftSaberLEDs,SABER_LENGTH,CRGB::Red, 5000, FadeCommand::Direction::OUT);
+FadeCommand fadeRightSaberOut = FadeCommand(rightSaberLEDs,SABER_LENGTH,CRGB::Blue, 5000, FadeCommand::Direction::OUT);
+FadeCommand fadeLeftSaberIn = FadeCommand(leftSaberLEDs,SABER_LENGTH,CRGB::Red, 3000, FadeCommand::Direction::IN);
+FadeCommand fadeRightSaberIn = FadeCommand(rightSaberLEDs,SABER_LENGTH,CRGB::Blue, 3000, FadeCommand::Direction::IN);
+DelayCommand delay4seconds = DelayCommand(4000);
+DelayCommand delay10seconds = DelayCommand(10000);
+Command* fadeSabersOutCmds[2] = {&fadeLeftSaberOut,&fadeRightSaberOut};
+ParallelCommand fadeSabersOut = ParallelCommand(fadeSabersOutCmds,2);
+Command* fadeSabersInCmds[2] = {&fadeLeftSaberIn,&fadeRightSaberIn};
+ParallelCommand fadeSabersIn = ParallelCommand(fadeSabersInCmds,2);
+Command* fadeInOutCmds[4] = {&delay4seconds,&fadeSabersOut,&delay10seconds,&fadeSabersIn};
+CommandSequence fadeInOut = CommandSequence(fadeInOutCmds,4);
+Command* fireDSCommands[2] = {&fireDeathStarSound,&fadeInOut};
+ParallelCommand fireDSCommand = ParallelCommand(fireDSCommands,2);
+  
+
 
 
 
@@ -144,12 +137,12 @@ void setup() {
   fireDSDebounce.interval(FIRE_DS_HOLD_MS);
 
   //Setup LEDs
-  FastLED.addLeds<NEOPIXEL, LEFT_LIGHTSABER_PIN>(leftLightSaber.leds, SABER_LENGTH);
-  FastLED.addLeds<NEOPIXEL, RIGHT_LIGHTSABER_PIN>(rightLightSaber.leds, SABER_LENGTH);
-  FastLED.addLeds<NEOPIXEL, LEFT_BACKLIGHT_PIN>(leftBacklight.leds, BACKLIGHT_LENGTH);
-  FastLED.addLeds<NEOPIXEL, RIGHT_BACKLIGHT_PIN>(rightBacklight.leds, BACKLIGHT_LENGTH);
-  FastLED.addLeds<NEOPIXEL, DEATHSTAR_BEAM_PIN>(deathStarBeam.leds, DS_BEAM_LENGTH);
-  FastLED.addLeds<NEOPIXEL, DEATHSTAR_RING_PIN>(deathStarRing.leds, DS_RING_LENGTH);
+  FastLED.addLeds<NEOPIXEL, LEFT_LIGHTSABER_PIN>(leftSaberLEDs, SABER_LENGTH);
+  FastLED.addLeds<NEOPIXEL, RIGHT_LIGHTSABER_PIN>(rightSaberLEDs, SABER_LENGTH);
+//  FastLED.addLeds<NEOPIXEL, LEFT_BACKLIGHT_PIN>(leftBacklightLEDs, BACKLIGHT_LENGTH);
+//  FastLED.addLeds<NEOPIXEL, RIGHT_BACKLIGHT_PIN>(rightBacklightLEDs, BACKLIGHT_LENGTH);
+//  FastLED.addLeds<NEOPIXEL, DEATHSTAR_BEAM_PIN>(deathStarLEDs, DS_BEAM_LENGTH);
+//  FastLED.addLeds<NEOPIXEL, DEATHSTAR_RING_PIN>(deathStarRingLEDs, DS_RING_LENGTH);
 
 
   //Relays
@@ -161,8 +154,6 @@ void setup() {
   digitalWrite(MARQUEE_RELAY_PIN,HIGH);
   digitalWrite(BUTTON_LED_RELAY_PIN,HIGH);
 #endif
-
-  setupAnimations();
 
 
 }
@@ -176,29 +167,7 @@ void loop() {
 
 
 
-void setupAnimations(){
-  // Power On
-  fillLeftSaberRed.init(leftLightSaber,CRGB::Red,SABER_FILL_RATE,FillCommand::Direction::FORWARD);
-  fillRightSaberBlue.init(rightLightSaber,CRGB::Blue,SABER_FILL_RATE,FillCommand::Direction::FORWARD);
-  powerOnCommand.add(&fillLeftSaberRed).add(&fillRightSaberBlue).add(&lightSaberOnSound);
-  
-  //Power Off
-  fillLeftSaberBlack.init(leftLightSaber,CRGB::Black,SABER_FILL_RATE,FillCommand::Direction::REVERSE);
-  fillRightSaberBlack.init(rightLightSaber,CRGB::Black,SABER_FILL_RATE,FillCommand::Direction::REVERSE);
-  powerOffCommand.add(&fillLeftSaberBlack).add(&fillRightSaberBlack).add(&lightSaberOffSound);
 
-  //Death Star Animation
-  delay4seconds.init(4000);
-  fadeLeftSaberOut.init(leftLightSaber, CRGB::Red, 5000, FadeCommand::Direction::OUT);
-  fadeRightSaberOut.init(rightLightSaber, CRGB::Blue, 5000, FadeCommand::Direction::OUT);
-  fadeSabersOut.add(&fadeLeftSaberOut).add(&fadeRightSaberOut);
-  delay10seconds.init(10000);
-  fadeLeftSaberIn.init(leftLightSaber, CRGB::Red, 3000, FadeCommand::Direction::IN);
-  fadeRightSaberIn.init(rightLightSaber, CRGB::Blue, 3000, FadeCommand::Direction::IN);
-  fadeSabersIn.add(&fadeLeftSaberIn).add(&fadeRightSaberIn);
-  fadeInOut.add(&delay4seconds).add(&fadeSabersOut).add(&delay10seconds).add(&fadeSabersIn);
-  fireDSCommand.add(&fireDeathStarSound).add(&fadeInOut);  
-}
 
 
 void processPowerButton(){
