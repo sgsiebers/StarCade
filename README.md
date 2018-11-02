@@ -11,6 +11,6 @@ This is still very much a work in progress.  Hopefully you won't have to wait ye
 
 ## Update 11/1/2018:
 
-Here's a high-level wiring diagram] for all the electronics.
+Here's a high-level wiring diagram for all the electronics.
 
 <img src="misc/WiringDiagram.png" width=80% height=80% align="middle">
