@@ -11,10 +11,9 @@
 //  PIN Definitions 
 ////////////////////////////
 
-// NOTE: Pins 0 & 1 inactive in DEBUG mode for serial diagnostics
-#define MARQUEE_RELAY_PIN 0
-#define BUTTON_LED_RELAY_PIN 1
-#define MAIN_POWER_RELAY_PIN 2
+#define MARQUEE_RELAY_PIN 53
+#define BUTTON_LED_RELAY_PIN 51
+#define MAIN_POWER_RELAY_PIN 49
 #define POWER_BUTTON 3
 #define FIRE_DS_BUTTON 4
 #define LEFT_LIGHTSABER_PIN 5
@@ -101,6 +100,7 @@ ParallelCommand powerOffCommand = ParallelCommand(powerOffCommands,5);
 
 // Fire DS Commands
 //Lightsabers
+// |<----- 5s ----->|<-- Fade Out 2s -->|<------ 6s ------>|<-- Flash 2s -->|<- Fade In 1s ->|<---- 4s ---->|<-- Fade Out 2s -->|<-- 2s -->|<--- Fade In 3s --->|
 DelayCommand delay5secondsLS = DelayCommand(5000);
 FadeCommand fadeLeftSaberOut = FadeCommand(leftSaberLEDs,SABER_LENGTH,CRGB::Red, 2000, FadeCommand::Direction::OUT);
 FadeCommand fadeRightSaberOut = FadeCommand(rightSaberLEDs,SABER_LENGTH,CRGB::Blue, 2000, FadeCommand::Direction::OUT);
@@ -131,6 +131,7 @@ CommandSequence fireDSSaberSeq = CommandSequence(fireDSSaberCmds, 4);
 
 
 //Backlights
+// |<-- 2s -->|<--- Flash 3s --->|<-- Fade Out 2s -->|<------ 6s ------>|<-- Flash 2s -->|<- Fade In 1s ->|<---- 4s ---->|<-- Fade Out 2s -->|<-- 2s -->|<-- Fade In 2s-->|
 DelayCommand delayLBL2seconds = DelayCommand(2000);
 DelayCommand delayRBL2seconds = DelayCommand(2000);
 FlashCommand flashLeftBack1 = FlashCommand(leftBacklightLEDs,BACKLIGHT_LENGTH,CRGB::Red, 3000, 9);
@@ -157,8 +158,23 @@ Command* rblDSCmds[10] = {&delayRBL2seconds, &flashRightBack1, &fadeRBLOut, &del
 CommandSequence rblDSSeq = CommandSequence(rblDSCmds, 10);
 
 
-// Death Star
+//Marquee
+// |<-----5s----->|< Off >|<--------8s-------->|<--Flash 2s-->|< On >|
+PinCommand turnOffM = PinCommand(MARQUEE_RELAY_PIN, HIGH, 5000);
+DelayCommand marqueeDelay8s = DelayCommand(8000);
+PinCommand mOnForFlash = PinCommand(MARQUEE_RELAY_PIN, LOW, 250);
+PinCommand mOffForFlash = PinCommand(MARQUEE_RELAY_PIN, HIGH, 250);
+Command* marqueeFlashCmds [2] = {&mOnForFlash , &mOffForFlash};
+CommandSequence marqueeFlashSeq = CommandSequence(marqueeFlashCmds, 2);
+LoopCommand marqueeFlashLoop = LoopCommand(4,&marqueeFlashSeq);
+PinCommand turnOnM =PinCommand(MARQUEE_RELAY_PIN, LOW, 0);
+Command* marqueeCmds [4] = {&turnOffM, &marqueeDelay8s, &marqueeFlashLoop, &turnOnM};
+CommandSequence marqueeSeq = CommandSequence(marqueeCmds, 4);
 
+
+
+// Death Star
+// |<----- 5s ----->|<-- Fill 2s -->|<--- Fade Out 3s --->|<-- Flash 2s -->|<- Fill 1s ->|<------- 7s ------->|<-- Fade Out 2s -->|
 DelayCommand delayDS5Seconds = DelayCommand(5000);
 FillCommand fillDSRing = FillCommand(deathStarRingLEDs, DS_RING_LENGTH, CRGB::Green, 2000/DS_RING_LENGTH, FillCommand::Direction::FORWARD);
 FadeCommand fadeDSRing = FadeCommand(deathStarRingLEDs, DS_RING_LENGTH, CRGB::Green, 3000, FadeCommand::Direction::OUT);
@@ -173,8 +189,8 @@ Command* fireDSRingBeamCmds[7] = {&delayDS5Seconds, &fillDSRing, &fadeDSRing, &f
 CommandSequence fireDSRingBeamSeq = CommandSequence(fireDSRingBeamCmds, 7);
 
 
-Command* fireDSCommands[5] = {&fireDeathStarSound,&fireDSSaberSeq, &lblDSSeq, &rblDSSeq, &fireDSRingBeamSeq};
-ParallelCommand fireDSCommand = ParallelCommand(fireDSCommands,5);
+Command* fireDSCommands[6] = {&fireDeathStarSound,&fireDSSaberSeq, &lblDSSeq, &rblDSSeq, &fireDSRingBeamSeq, &marqueeSeq};
+ParallelCommand fireDSCommand = ParallelCommand(fireDSCommands,6);
   
 
 
@@ -215,13 +231,11 @@ void setup() {
 
   //Relays
   pinMode(MAIN_POWER_RELAY_PIN,OUTPUT);
-  digitalWrite(MAIN_POWER_RELAY_PIN,HIGH);
-#ifndef DEBUG
   pinMode(MARQUEE_RELAY_PIN,OUTPUT);
   pinMode(BUTTON_LED_RELAY_PIN,OUTPUT);
+  digitalWrite(MAIN_POWER_RELAY_PIN,HIGH);
   digitalWrite(MARQUEE_RELAY_PIN,HIGH);
   digitalWrite(BUTTON_LED_RELAY_PIN,HIGH);
-#endif
 
 
 }
@@ -245,10 +259,8 @@ void processPowerButton(){
       if(powerDebounce.fell()){
         DEBUG_PRINT("Powering on...");
         digitalWrite(MAIN_POWER_RELAY_PIN,LOW);
-#ifndef DEBUG        
         digitalWrite(MARQUEE_RELAY_PIN,LOW);
         digitalWrite(BUTTON_LED_RELAY_PIN,LOW);
-#endif        
         powerOnCommand.begin();
         systemState = POWERING_ON;
       }
@@ -265,10 +277,8 @@ void processPowerButton(){
       if(powerDebounce.fell()){
         DEBUG_PRINT("Powering off...");
         digitalWrite(MAIN_POWER_RELAY_PIN,HIGH);
-#ifndef DEBUG        
         digitalWrite(MARQUEE_RELAY_PIN,HIGH);
         digitalWrite(BUTTON_LED_RELAY_PIN,HIGH);
-#endif        
         powerOffCommand.begin();
         systemState = POWERING_OFF;
       }
