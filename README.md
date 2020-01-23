@@ -9,7 +9,7 @@ This is still very much a work in progress.  Hopefully you won't have to wait ye
 <img src="StarcadeModel.png" width=50% height=50% align="middle">
 
 
-## Update 6/12/2018:
+## 6/12/2018:
 Working Lightsabers!  These fun accents are made from [NeoPixel strips](https://www.amazon.com/ALITOVE-Individually-Addressable-Flexible-Waterproof/dp/B00VQ0D2TY) threaded trough a frosted acrylic tube and animated using my [SimpleAnimation](https://github.com/sgsiebers/SimpleAnimation) library.  Sound effects are coordinated by the Arduino triggering pins on an [Adafruit Mini Sound Board](https://www.amazon.com/Adafruit-Audio-Mini-Sound-Board/dp/B01GQFVV2I).  I also wired up a simple passive audio mixer so the Raspberry Pi and Sound Fx board could both drive the same speaker output.  Here's a great [example](https://www.instructables.com/id/Altoids-Tin-18-Stereo-Mixer/) of how you can make one yourself, although mine is much more crude.  I simply hacked the ends off some old Aux cables, soldered the resistors, taped it up, and stuffed it into a random plastic container.
 
 It's pretty cool to see them in action, but for the complete experience with sound [watch this!](https://youtu.be/m8hfb_nRrew)
@@ -17,14 +17,19 @@ It's pretty cool to see them in action, but for the complete experience with sou
 <img src="misc/Lightsabers.gif">
 
 
-## Update 11/1/2018:
+## 11/1/2018:
 
 Here's a high-level wiring diagram for all the electronics:
 
 <img src="misc/WiringDiagram.png" width=100% height=100%>
 
 
-## Update 11/29/2018:
+## 11/29/2018:
 My young apprentice has been busy helping me code a fairly complex LED animation sequence that will play when you "fire the Death Star" from an auxiliary button.  Check out our [bench test video!](https://youtu.be/5v-LOUCcdTg).  Also, here's a quick shot playing with the RetroPie emulator:
 <img src="misc/OwenTesting.jpg">
+
+## 1/4/2019:
+We prototyped the control deck this week, wiring up the game buttons and joystick to an [I-PAC2](https://www.ultimarc.com/control-interfaces/i-pacs/i-pac2/) USB button encoder.  My daughter has decided she wants to join in the fun, so here's a shot of her taking the controls for a test drive:
+
+<img src="misc/VioletTestingControls.jpg">
 
