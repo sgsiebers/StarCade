@@ -33,3 +33,11 @@ We prototyped the control deck this week, wiring up the game buttons and joystic
 
 <img src="misc/VioletTestingControls.jpg">
 
+## 12/1/2019:
+We've been on quite a long hiatus, distracted by kids, travel, and a new puppy, but as the weather turns cold again, we are finally finding the time to refocus on StarCade.  Next up, the cabinet.  Here are several pics as the design takes shape.
+
+<img src="misc/CabinetSidePanel.jpg">
+<img src="misc/CabinetWkids.jpg">
+<img src="misc/CabinetTakingShape.jpg">
+<img src="misc/CabinetAlmostDone.jpg">
+
