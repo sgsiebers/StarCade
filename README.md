@@ -36,8 +36,29 @@ We prototyped the control deck this week, wiring up the game buttons and joystic
 ## 12/1/2019:
 We've been on quite a long hiatus, distracted by kids, travel, and a new puppy, but as the weather turns cold again, we are finally finding the time to refocus on StarCade.  Next up, the cabinet.  Here are several pics as the design takes shape.
 
-<img src="misc/CabinetSidePanel.jpg">
-<img src="misc/CabinetWkids.jpg">
-<img src="misc/CabinetTakingShape.jpg">
-<img src="misc/CabinetAlmostDone.jpg">
+<img src="misc/CabinetSidePanel.jpg" width=50% height=50%>
+<img src="misc/CabinetWkids.jpg" width=50% height=50%>
+<img src="misc/CabinetTakingShape.jpg" width=50% height=50%>
+<img src="misc/CabinetAlmostDone.jpg" width=50% height=50%>
 
+## 1/11/2020:
+We've spent the last few weeks installing componentry in the cabinet and getting it ready for a test run.  We mounted the acrylic tubes for the lightsabers, drilled out holes for the control deck, and mounted the screen, control board, and speakers.  We are finally to the point where you can kind of play  it (using an old USB control pad for now).
+
+<img src="misc/ControlBoardMounted.jpg" width=50% height=50%>
+<img src="misc/ControlDeck.jpg" width=50% height=50%>
+<img src="misc/CabinetWSpeakers.jpg" width=50% height=50%>
+<img src="misc/CabinetWSpeakers.jpg" width=50% height=50%>
+<img src="misc/KidsPlaying.jpg" width=50% height=50%>
+
+
+## 1/25/2020:
+With the cabinet construction wrapping up, it's time to get going on the marquee.  Although I'm not the most talented with an image editor, I was able to use GIMP to cobble together a fairly basic design that doesn't look half bad.  We had this printed on the back of an acryllic plastic sheet and it slides right into place in the top of the cabinet.
+
+<img src="misc/StarcadeMarquee.png" width=75% height=75%>
+
+We also created a backlight for the marquee by chopping up a cheap [strip of white LED lights](https://www.amazon.com/Ustellar-Dimmable-Daylight-Lighting-Non-Waterproof/dp/B075RYSHQQ), attaching them to a thin piece of scrap plywood, and soldering it all together in parallel.  The backlight is controlled via relays wired into the Arduino so we can switch it on and off as needed.  
+
+<img src="misc/MarqueeBacklight.jpg" width=50% height=50%>
+<img src="misc/MarqueeBacklightWiring.jpg" width=50% height=50%>
+
+Upon testing, the only problem is that the backlight is way too bright relative to the light transmittance of the marquee printing, so it washes out the design when lit up (even when dimmed to the minimum setting).  I'm still trying to figure out what we'll do about this.  Perhaps we'll only light up the marquee during special animation sequences, or I'm considering spraying a light coating of paint on the back of the marquee to make it more opaque.
