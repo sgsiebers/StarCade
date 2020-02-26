@@ -67,6 +67,7 @@ Upon testing, the only problem is that the backlight is way too bright relative 
 
 ## 2/15/2020: Safety First
 As you might have noticed in our wiring diagram, we are using the Arduino to switch relays feeding power to the LCD monitor which means having 120V power exposed on the control board.  To ensure the interior of the cabinet remains safe against accidental touches, my apprentice used Tinkercad to design a simple enclousure that we will mount over the top of the relays with small cutouts for the wiring to pass in and out.  A few hours of 3D printing later, and Viola, the exact size and shape we need. 
+
 <img src="misc/RelayCover.jpg" width=50% height=50%>
 <img src="misc/OwenRelayCover.jpg" width=50% height=50%>
 
@@ -74,6 +75,7 @@ As you might have noticed in our wiring diagram, we are using the Arduino to swi
 
 ## 2/22/2020: Paint it Black
 After a few quick coats of paint this weekend, suddenly our little project is starting to look like the real deal!  I bought a relatively affordable [HVLP Paint Spray Gun](https://www.amazon.com/HomeRight-C800971-Painter-Painting-Projects/dp/B071X9FZ7R) online and hung plastic from the celing in my basement to create a makeshift paint studio, then set to work.  I was suprised how well the sprayer handled both primer and latex paint (Sherwin Williams) with no thinning necessary.  My young apprentice even strapped on a mask to lay down a few layers of his own.  We'll let this cure for a couple of weeks to get a nice strong finish before moving on to futher finish work.
+
 <img src="misc/CabinetWPrimer.jpg" width=50% height=50%>
 <img src="misc/OwenScottSprayGun.jpg" width=50% height=50%>
 <img src="misc/OwenSprayGun.jpg" width=50% height=50%>
