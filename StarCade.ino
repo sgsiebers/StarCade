@@ -11,27 +11,28 @@
 //  PIN Definitions 
 ////////////////////////////
 
-#define MARQUEE_RELAY_PIN 53
-#define BUTTON_LED_RELAY_PIN 51
-#define MAIN_POWER_RELAY_PIN 49
-#define POWER_BUTTON 3
-#define FIRE_DS_BUTTON 4
-#define LEFT_LIGHTSABER_PIN 5
-#define RIGHT_LIGHTSABER_PIN 6
-#define LEFT_BACKLIGHT_PIN 7
-#define RIGHT_BACKLIGHT_PIN 8
-#define POWER_ON_SOUND_PIN 9
-#define POWER_OFF_SOUND_PIN 10
-#define FIRE_DS_SOUND_PIN 11
-#define DEATHSTAR_BEAM_PIN 12
-#define DEATHSTAR_RING_PIN 13
+#define MARQUEE_RELAY_PIN 45
+#define BUTTON_LED_RELAY_PIN 47
+#define MAIN_POWER_RELAY_PIN 43
+#define POWER_BUTTON 12
+#define FIRE_DS_BUTTON 13
+#define LEFT_LIGHTSABER_PIN 37
+#define RIGHT_LIGHTSABER_PIN 34
+#define LEFT_BACKLIGHT_PIN 35
+#define RIGHT_BACKLIGHT_PIN 36
+#define POWER_ON_SOUND_PIN 23
+#define POWER_OFF_SOUND_PIN 25
+#define FIRE_DS_SOUND_PIN 27
+#define DEATHSTAR_BEAM_PIN 16
+#define DEATHSTAR_RING_PIN 17
 
 
 
 //Timing Definitions
 #define LOOP_WAIT_MS 1
 #define FIRE_DS_HOLD_MS 50
-#define POWER_HOLD_MS 50
+#define POWER_HOLD_ON_MS 50
+#define POWER_HOLD_OFF_MS 3500
 #define SABER_FILL_RATE 20
 #define BACKLIGHT_FADE_MS 2000
 
@@ -44,7 +45,8 @@
 enum SYSTEM_STATE {OFF=0, POWERING_ON=1, ON=2, POWERING_OFF=3, FIRING_DS = 4};
 SYSTEM_STATE systemState = OFF;
 
-Bounce powerDebounce = Bounce();
+Bounce powerOnDebounce = Bounce();
+Bounce powerOffDebounce = Bounce();
 Bounce fireDSDebounce = Bounce();
 
 
@@ -212,8 +214,10 @@ void setup() {
 
   //Setup power button
   pinMode(POWER_BUTTON,INPUT_PULLUP);
-  powerDebounce.attach(POWER_BUTTON);
-  powerDebounce.interval(POWER_HOLD_MS);
+  powerOnDebounce.attach(POWER_BUTTON);
+  powerOnDebounce.interval(POWER_HOLD_ON_MS);
+  powerOffDebounce.attach(POWER_BUTTON);
+  powerOffDebounce.interval(POWER_HOLD_OFF_MS);
 
   //Setup fire Death Star button
   pinMode(FIRE_DS_BUTTON,INPUT_PULLUP);
@@ -253,10 +257,11 @@ void loop() {
 
 
 void processPowerButton(){
-  powerDebounce.update(); 
+  powerOnDebounce.update();
+  powerOffDebounce.update(); 
   switch(systemState){
     case OFF:
-      if(powerDebounce.fell()){
+      if(powerOnDebounce.fell()){
         DEBUG_PRINT("Powering on...");
         digitalWrite(MAIN_POWER_RELAY_PIN,LOW);
         digitalWrite(MARQUEE_RELAY_PIN,LOW);
@@ -274,7 +279,7 @@ void processPowerButton(){
       }
       break;
     case ON:
-      if(powerDebounce.fell()){
+      if(powerOffDebounce.fell()){
         DEBUG_PRINT("Powering off...");
         digitalWrite(MAIN_POWER_RELAY_PIN,HIGH);
         digitalWrite(MARQUEE_RELAY_PIN,HIGH);
@@ -311,5 +316,3 @@ void processFireDS(){
     }
   }
 }
-
-
