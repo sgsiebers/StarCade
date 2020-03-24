@@ -12,6 +12,9 @@ This is still very much a work in progress.  Hopefully you won't have to wait ye
 
 # Progress Updates
 
+<details>
+    <summary>Click Here to See Previous Updates</summary>
+
 ## 6/12/2018: Lightsaber Prototype
 These fun accents are made from [NeoPixel strips](https://www.amazon.com/ALITOVE-Individually-Addressable-Flexible-Waterproof/dp/B00VQ0D2TY) threaded trough a frosted acrylic tube and animated using my [SimpleAnimation](https://github.com/sgsiebers/SimpleAnimation) library.  Sound effects are coordinated by the Arduino triggering pins on an [Adafruit Mini Sound Board](https://www.amazon.com/Adafruit-Audio-Mini-Sound-Board/dp/B01GQFVV2I).  I also wired up a simple passive audio mixer so the Raspberry Pi and Sound Fx board could both drive the same speaker output.  Here's a great [example](https://www.instructables.com/id/Altoids-Tin-18-Stereo-Mixer/) of how you can make one yourself, although mine is much more crude.  I simply hacked the ends off some old Aux cables, soldered the resistors, taped it up, and stuffed it into a random plastic container.
 
@@ -81,3 +84,28 @@ After a few quick coats of paint this weekend, suddenly our little project is st
 <img src="misc/OwenSprayGun.jpg" width=50% height=50%>
 <img src="misc/CabinetWPaint.jpg" width=50% height=50%>
 <img src="misc/CabinetPaintedUpright.jpg" width=50% height=50%>
+
+
+## 3/14/2020: Wires, Wires and More Wires
+
+With the cabinet all painted we are ready to begin installing the main components.  First up: wiring the control deck.  I had a decent start from the prototype we made a while back, but that was only a single-player version, and because we chose to use LED lighted buttons it was nearly twice the work.  80 wire crimps later, and we are in business.  Below, my young apprentice helps me test everything out.  
+
+Something I really agonized over is what type of auxiliary buttons we need to naviagte the system.  I ended up settling on only two.  One of them (yellow) is used to escape from the emulator back into the main Emulation Station launcher shell.  The other (white) is used to trigger the I-PAC2 "shift" function which makes all other buttons output secondary keycodes that can be used for system control rather than gameplay.
+
+<img src="misc/ButtonWiring.jpg" width=50% height=50%>
+<img src="misc/ButtonsTopView.jpg" width=50% height=50%>
+<img src="misc/TestingControls.jpg" width=50% height=50%>
+
+</details>
+
+# Latest News
+
+## 3/22/2020: The Force Awakens
+
+This week it's really all started to come together!  We mounted the monitor, electronics board, and control deck, and wired up the lightsabers.  We also wired the 120V relay to switch power to the monitor and Pi so you can see the (nearly) complete power on effect.  We still have a lot of small details to finish including the marquee backlight, cabinet LED backlights, speaker grills, and of course to print and apply the final decals and T-moulding.  Still, it's an incredible feeling to see the finish line coming into view!
+
+<img src="misc/CabinetWLightsabers.jpg">
+
+To get the full experience [watch this](https://youtu.be/ezYyY2bDof8).
+
+
